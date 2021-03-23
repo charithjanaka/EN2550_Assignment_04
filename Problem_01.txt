@@ -74,3 +74,36 @@ for t in range(iterations):
     y_pred = x.dot(w1) + b1
     train_acc = 1.0 - 1/(Ntr*9)*(np.abs(np.argmax(y_train, axis = 1) - np.argmax(y_pred, axis = 1))).sum()
     train_acc_history.append(train_acc)
+
+# Printing accuracies and displaying w as images
+
+# Weight Matrix W1 as 10 images
+f, axarr = plt.subplots(1, 10)
+f.set_size_inches(50, 12)
+
+for i in range(10):
+    img = w1[:,i].reshape(32,32,3)
+    axarr[i].imshow(img*1000)
+    axarr[i].axis('off')
+plt.show()
+
+# History
+fig, ax = plt.subplots(1,2, figsize = (10,5))
+ax[0].plot(loss_history)                # Training Loss History
+ax[1].plot(train_acc_history)           # Training Accuracy History
+
+# Calculating and Printing Training Accuracy
+x_t = x_train
+y_pred = x_t.dot(w1) + b1
+train_acc = 1.0 - 1/(Ntr*9)*(np.abs(np.argmax(y_train, axis = 1) - np.argmax(y_pred, axis = 1))).sum()
+print("train_acc = ",train_acc)
+
+# Calculating and Printing Testing Accuracy
+x_t = x_test
+y_pred = x_t.dot(w1) + b1
+test_acc =  1.0 - 1/(Nte*9)*(np.abs(np.argmax(y_test, axis = 1) - np.argmax(y_pred, axis = 1))).sum()
+print("test_acc = ",test_acc)
+
+# Testing Loss
+test_loss = (1./Nte)*(np.square(y_pred - y_test).sum())
+print("test_loss = ",test_loss)
