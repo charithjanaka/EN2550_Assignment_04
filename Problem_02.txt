@@ -42,7 +42,7 @@ print("b2:", b2.shape)
 batch_size = Ntr                    # Batch size
 
 iterations = 300                    # Number of iterations to run Gradient Descent (For this case it equals to 300 epochs)
-alpha = 2e-2                      # Learning Rate
+alpha = 2e-3                        # Learning Rate
 alpha_decay= 0.999                  # Decay learning rate for convergence
 Lambda = 5e-6                       # Regularization rate
 
