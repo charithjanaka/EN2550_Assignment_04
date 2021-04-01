@@ -41,48 +41,56 @@ print("b2:", b1.shape)
 
 batch_size = 500                    # Batch size
 
-iterations = 30000                   # Number of iterations to run Gradient Descent (For this case it equals to 300 epochs)
-alpha = 2e-3                      # Learning Rate
+iterations = 100                    # Number of epochs
+alpha = 1.5e-2                      # Learning Rate
 alpha_decay= 0.999                  # Decay learning rate for convergence
 Lambda = 5e-6                       # Regularization rate
 
 loss_history = []                   # Loss history
 train_acc_history = []              # Traing accuracy history
 
+seed = 0
+rng = np.random.default_rng(seed=seed)  # Random Generator
+
+# Loop over 100 epochs
 for t in range(iterations):
-    indices = np.random.choice(x_train.shape[0], batch_size, replace=False) 
-    # Forward pass
-    x = x_train[indices]
-    y = y_train[indices]
-    h = 1.0/(1.0+np.exp(-(x.dot(w1) + b1)))
-    y_pred = h.dot(w2) + b2
-    loss = (1./batch_size)*(np.square(y_pred - y).sum()) + Lambda * (np.sum(w1 * w1) + np.sum(w1 * w1))
-    loss_history.append(loss)
+    Indices = np.arange(Ntr)
+    Indices = np.split(Indices, 100)    # Generate an array consisting of sub arrays which having 500 indices of training images
+    # Loop over 100 mini batches
+    for i,indices in enumerate(Indices):
+      rng.shuffle(indices)              # Randomly shuffle the indices
+      # Forward pass
+      x = x_train[indices]
+      y = y_train[indices]
+      h = 1.0/(1.0+np.exp(-(x.dot(w1) + b1)))
+      y_pred = h.dot(w2) + b2
+      loss = (1./batch_size)*(np.square(y_pred - y).sum()) + Lambda * (np.sum(w1 * w1) + np.sum(w1 * w1))
+      loss_history.append(loss)
 
-    # Printing Loss in each 10 iterations
-    if t % 10 == 0:
-        print('iteration %d / %d: loss %f ' %(t, iterations, loss))
+      # Printing Loss in each 10 iterations
+      if i % 100 == 0:
+          print('iteration %d / %d: loss %f ' %(t, iterations, loss))
 
-    # Backward pass
-    dy_pred = (1./batch_size)*2.0*(y_pred - y)              # PD of loss w.r.t. y_pred
-    dw2 = h.T.dot(dy_pred) + Lambda * w2                    # PD of loss w.r.t. w2
-    db2 = dy_pred.sum(axis = 0)                             # PD of loss w.r.t. b2
-    dh = dy_pred.dot(w2.T)                                  # PD of loss w.r.t. h
-    dw1 = x.T.dot(dh*h*(1-h)) + Lambda * w1                 # PD of loss w.r.t. w1 
-    db1 = (dh*h*(1-h)).sum(axis = 0)                        # PD of loss w.r.t. b1
-    w2 -= alpha * dw2                                       # Update weights 2
-    b2 -= alpha * db2                                       # Update biases 2
-    w1 -= alpha * dw1                                       # Update weights 1
-    b1 -= alpha * db1                                       # Update biases 1
-    alpha *= alpha_decay                                    # Decay learning rate
+      # Backward pass
+      dy_pred = (1./batch_size)*2.0*(y_pred - y)              # PD of loss w.r.t. y_pred
+      dw2 = h.T.dot(dy_pred) + Lambda * w2                    # PD of loss w.r.t. w2
+      db2 = dy_pred.sum(axis = 0)                             # PD of loss w.r.t. b2
+      dh = dy_pred.dot(w2.T)                                  # PD of loss w.r.t. h
+      dw1 = x.T.dot(dh*h*(1-h)) + Lambda * w1                 # PD of loss w.r.t. w1 
+      db1 = (dh*h*(1-h)).sum(axis = 0)                        # PD of loss w.r.t. b1
+      w2 -= alpha * dw2                                       # Update weights 2
+      b2 -= alpha * db2                                       # Update biases 2
+      w1 -= alpha * dw1                                       # Update weights 1
+      b1 -= alpha * db1                                       # Update biases 1
+      alpha *= alpha_decay                                    # Decay learning rate
 
-    # Appending Train accuracy to history
-    h = 1.0/(1.0 + np.exp(-(x.dot(w1)+b1)))
-    y_pred = h.dot(w2) + b2
-    train_acc = 1.0 - 1/(Ntr*9)*(np.abs(np.argmax(y, axis = 1) - np.argmax(y_pred, axis = 1))).sum()
-    train_acc_history.append(train_acc)
+      # Appending Train accuracy to history
+      h = 1.0/(1.0 + np.exp(-(x.dot(w1)+b1)))
+      y_pred = h.dot(w2) + b2
+      train_acc = 1.0 - 1/(Ntr*9)*(np.abs(np.argmax(y, axis = 1) - np.argmax(y_pred, axis = 1))).sum()
+      train_acc_history.append(train_acc)
     
-    # Printing accuracies and losses
+# Printing accuracies and losses
 
 # History
 fig, ax = plt.subplots(1,2, figsize = (10,5))
